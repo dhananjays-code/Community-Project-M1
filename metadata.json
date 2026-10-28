@@ -1,0 +1,8 @@
+{
+  "name": "CleanBharat Connect - Community Clean-up Drive Portal",
+  "description": "A production-grade portal for organizing, joining, and tracking environmental clean-up drives across India with 1-click registration, impact metrics, and community engagement.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

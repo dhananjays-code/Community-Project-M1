@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CleanBharat Connect | Community Clean-up Drive Portal</title>
+  <meta name="description" content="Organize, discover, and join environmental clean-up drives across India with 1-click registration and real-time impact tracking.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- Sticky Top Header & Tab Navigation -->
+  <header class="site-header">
+    <div class="nav-container">
+      
+      <!-- Brand Logo -->
+      <a href="home.html" class="brand-wrapper">
+        <div class="brand-logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="brand-name">
+          CleanBharat
+          <span class="brand-tagline">PrakritiSetu</span>
+        </div>
+      </a>
+
+      <!-- Tabbed Navigation -->
+      <nav class="nav-tabs" role="tablist">
+        <button type="button" class="tab-btn active" data-tab="activeDrives" onclick="switchNavTab('activeDrives')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Active Drives
+        </button>
+        <button type="button" class="tab-btn" data-tab="pastDrives" onclick="switchNavTab('pastDrives')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Past Drives
+        </button>
+        <button type="button" class="tab-btn" data-tab="community" onclick="switchNavTab('community')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Green Community
+        </button>
+        <button type="button" class="tab-btn" data-tab="myProfile" onclick="switchNavTab('myProfile')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          My Profile & Badges
+        </button>
+      </nav>
+
+      <!-- Nav Action Controls -->
+      <div class="nav-actions">
+        <button type="button" class="btn btn-secondary" onclick="openHostDriveModal()" style="font-size: 0.85rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Host a Drive
+        </button>
+
+        <button type="button" class="btn btn-outline" onclick="openNotificationModal()" title="View Sent Email Notifications" style="padding: 0.5rem 0.85rem; font-size: 0.825rem; gap: 0.35rem; position: relative;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span>Emails</span>
+          <span id="unreadEmailsBadge" style="display: none; width: 8px; height: 8px; border-radius: 50%; background: #E11D48; position: absolute; top: 6px; right: 6px;"></span>
+        </button>
+
+        <div class="user-chip" id="userHeaderChip" onclick="switchNavTab('myProfile')" style="cursor: pointer;">
+          <div class="user-avatar-sm" id="userAvatarLetter">A</div>
+          <span id="userNameHeader" style="max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Steward</span>
+        </div>
+
+        <button type="button" class="btn btn-outline" onclick="handleLogout()" title="Logout" style="padding: 0.5rem 0.85rem; font-size: 0.825rem; gap: 0.35rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Sign Out</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Dynamic Tab Content Container -->
+  <main class="main-wrapper">
+    
+    <!-- ===================================================================
+         TAB SECTION A: ACTIVE DRIVES
+         =================================================================== -->
+    <section class="tab-pane active" id="pane-activeDrives">
+      <div class="section-header">
+        <h1 class="section-title">
+          <span>Active Clean-up Drives</span>
+          <span style="font-size: 0.85rem; font-weight: 600; background: var(--primary-light); color: var(--primary); padding: 0.2rem 0.65rem; border-radius: var(--radius-full);" id="activeDrivesCount">
+            Loading...
+          </span>
+        </h1>
+        <p class="section-subtitle">
+          Join high-impact coastal, river, and urban missions. Register with a single click using your verified profile. Equipment & safety gear are provided on-site.
+        </p>
+      </div>
+
+      <!-- Filters & Search Toolbar -->
+      <div class="drives-toolbar">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchInput" placeholder="Search by city, beach, or river name..." oninput="filterDrives()">
+        </div>
+
+        <div class="category-pills">
+          <button type="button" class="filter-pill active" data-category="All" onclick="setCategoryFilter('All', this)">All Initiatives</button>
+          <button type="button" class="filter-pill" data-category="Beach" onclick="setCategoryFilter('Beach', this)">Beach 🏖️</button>
+          <button type="button" class="filter-pill" data-category="River" onclick="setCategoryFilter('River', this)">River 🌊</button>
+          <button type="button" class="filter-pill" data-category="Tree Plantation" onclick="setCategoryFilter('Tree Plantation', this)">Tree Plantation 🌱</button>
+          <button type="button" class="filter-pill" data-category="Urban Cleanup" onclick="setCategoryFilter('Urban Cleanup', this)">Urban Lakes 🏙️</button>
+        </div>
+      </div>
+
+      <!-- Drives Grid List -->
+      <div class="drives-grid" id="activeDrivesGrid">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         TAB SECTION B: PAST DRIVES & IMPACT
+         =================================================================== -->
+    <section class="tab-pane" id="pane-pastDrives">
+      <div class="section-header">
+        <h1 class="section-title">Past Drives & Environmental Impact</h1>
+        <p class="section-subtitle">
+          Visual before & after transformations, quantifiable waste diversion statistics, and verifiable volunteer certificates.
+        </p>
+      </div>
+
+      <!-- Real Dynamic Impact Statistics -->
+      <div class="impact-stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          </div>
+          <div>
+            <div class="stat-number" id="statTotalWaste">0 kg</div>
+            <div class="stat-title">Plastic & Marine Debris Diverted</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <div class="stat-number" id="statTotalVolunteers">0</div>
+            <div class="stat-title">Volunteers Mobilized</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <div class="stat-number" id="statTotalDrives">0</div>
+            <div class="stat-title">Successful Drives Completed</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div>
+            <div class="stat-number" id="statTotalTrees">0</div>
+            <div class="stat-title">Native Trees Planted</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Before / After Interactive Image Comparison Slider (Dynamically rendered if completed drives exist) -->
+      <div id="baShowcaseWrapper">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+
+      <!-- Past Drives Archive Grid -->
+      <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">Past Drives Archive</h3>
+      <div class="past-archive-grid" id="pastDrivesGrid">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         TAB SECTION C: GREEN COMMUNITY
+         =================================================================== -->
+    <section class="tab-pane" id="pane-community">
+      <div class="section-header">
+        <h1 class="section-title">Green Community Feed</h1>
+        <p class="section-subtitle">
+          Connect with environmental stewards, share on-ground drive updates, ask composting questions, and celebrate zero-waste milestones.
+        </p>
+      </div>
+
+      <div class="community-layout">
+        
+        <!-- Left: Post Creation & Feed -->
+        <div>
+          <!-- Post Creation Box -->
+          <div class="create-post-card">
+            <div class="post-header-prompt">
+              <div class="author-avatar" id="currentUserPostAvatar">A</div>
+              <div>
+                <div style="font-weight: 700; font-size: 0.95rem;" id="currentUserPostName">Ananya Patel</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Share an update or inspire fellow citizens</div>
+              </div>
+            </div>
+
+            <textarea class="post-textarea" id="newPostContent" placeholder="What ecological action did you take today? (e.g., Led an apartment composting drive, segregated 5kg plastic, joined beach cleanup...)"></textarea>
+
+            <div style="margin-top: 0.6rem;">
+              <label style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">Select Topics:</label>
+              <div class="post-tag-selector" id="postTagSelector">
+                <span class="tag-check selected" onclick="toggleTag(this)">#CleanMyCity</span>
+                <span class="tag-check" onclick="toggleTag(this)">#ZeroWaste</span>
+                <span class="tag-check" onclick="toggleTag(this)">#Composting</span>
+                <span class="tag-check" onclick="toggleTag(this)">#PlasticsFree</span>
+                <span class="tag-check" onclick="toggleTag(this)">#RiverRestoration</span>
+              </div>
+            </div>
+
+            <div class="post-actions-bar">
+              <input type="url" class="form-input" id="newPostImageUrl" placeholder="Optional Photo URL (e.g. https://...)" style="max-width: 300px; font-size: 0.8rem; padding: 0.4rem 0.6rem;">
+              <button type="button" class="btn btn-primary" onclick="submitCommunityPost()" style="padding: 0.5rem 1.25rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Post Update
+              </button>
+            </div>
+          </div>
+
+          <!-- Feed Posts Stream -->
+          <div class="community-feed" id="communityFeedContainer">
+            <!-- Dynamic Post Cards -->
+          </div>
+        </div>
+
+        <!-- Right: Community Sidebar -->
+        <aside class="community-sidebar">
+          
+          <!-- Top Eco-Stewards Leaderboard -->
+          <div class="sidebar-widget">
+            <h4 class="widget-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-gold);"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+              Top Eco-Stewards (This Month)
+            </h4>
+            <div class="top-volunteers-list" id="topVolunteersList">
+              <!-- Rendered dynamically by app.js based on real steward points -->
+            </div>
+          </div>
+
+          <!-- Indian Waste Segregation Guidelines Card -->
+          <div class="sidebar-widget" style="background: #F0FDF4; border-color: #BBF7D0;">
+            <h4 class="widget-title" style="color: var(--primary-hover);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Standard On-Site Segregation
+            </h4>
+            <ul style="font-size: 0.8rem; color: var(--text-secondary); padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.4rem;">
+              <li><strong>Blue Sacks:</strong> Hard plastics, PET bottles, clean HDPE containers.</li>
+              <li><strong>Green Sacks:</strong> Organic/floral offerings & decomposing matter.</li>
+              <li><strong>Yellow Sacks:</strong> Multilayer packaging (MLP), chips wrappers, thermocol.</li>
+              <li><strong>Red Sacks:</strong> Sanitary or sharp debris (handled by coordinator).</li>
+            </ul>
+          </div>
+
+        </aside>
+
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         TAB SECTION D: MY PROFILE & GAMIFICATION
+         =================================================================== -->
+    <section class="tab-pane" id="pane-myProfile">
+      <div class="section-header">
+        <h1 class="section-title">My Profile & Gamification</h1>
+        <p class="section-subtitle">
+          Your environmental credentials, earned impact badges, and active clean-up enrollments.
+        </p>
+      </div>
+
+      <div class="profile-grid">
+        
+        <!-- Left: Profile Summary Card -->
+        <div class="profile-card">
+          <div class="profile-avatar-large" id="profileCardAvatar">A</div>
+          <h2 class="profile-name" id="profileCardName">Ananya Patel</h2>
+          <span class="profile-role-badge" id="profileCardRole">Verified Environmental Volunteer</span>
+
+          <div class="profile-info-list">
+            <div class="info-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <span id="profileCardPhone">+91 98203 45678</span>
+            </div>
+            <div class="info-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <span id="profileCardEmail">ananya.patel@cleanbharat.org</span>
+            </div>
+            <div class="info-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span id="profileCardLocation">Mumbai, MH (400050)</span>
+            </div>
+            <div class="info-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+              <span id="profileCardEducation">Mumbai University - Life Sciences</span>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem; text-align: left;">
+            <label style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted);">Eco Interests:</label>
+            <div class="pill-list" id="profileInterestsPills" style="margin-top: 0.4rem;">
+              <span class="safety-pill">Beach Cleanup</span>
+              <span class="safety-pill">River Restoration</span>
+              <span class="safety-pill">Plastic Free</span>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px dashed var(--border-color);">
+            <button type="button" class="btn btn-danger-outline" style="width: 100%; font-size: 0.85rem;" onclick="handleLogout()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              Sign Out of Account
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Gamification Badges & Enrolled Drives -->
+        <div>
+          
+          <!-- Eco-Score Banner -->
+          <div class="eco-score-banner">
+            <div class="score-content">
+              <h3>Eco-Karma Score</h3>
+              <p>Earn +25 points per registered drive and +10 points for sharing community reports.</p>
+            </div>
+            <div class="score-display">
+              <div class="score-number" id="profileScoreDisplay">175</div>
+              <div class="score-level" id="profileLevelText">Earth Guardian</div>
+            </div>
+          </div>
+
+          <!-- Badges Showcase -->
+          <div class="badges-container">
+            <h3 style="font-size: 1.15rem;">Badges & Recognitions</h3>
+            <div class="badges-grid" id="badgesGrid">
+              <div class="badge-card unlocked">
+                <div class="badge-icon-wrap">🌊</div>
+                <div class="badge-title">River Guardian</div>
+                <div class="badge-desc">Joined Yamuna or River restoration</div>
+              </div>
+              <div class="badge-card unlocked">
+                <div class="badge-icon-wrap">🏖️</div>
+                <div class="badge-title">Coast Guard</div>
+                <div class="badge-desc">Protected marine wildlife at beaches</div>
+              </div>
+              <div class="badge-card unlocked">
+                <div class="badge-icon-wrap">♻️</div>
+                <div class="badge-title">Waste Segregator</div>
+                <div class="badge-desc">Categorized over 50kg dry plastic</div>
+              </div>
+              <div class="badge-card locked">
+                <div class="badge-icon-wrap">🌱</div>
+                <div class="badge-title">Master Planter</div>
+                <div class="badge-desc">Plant 10 native Indian trees</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Drives Organized by Me (Organizer Controls) -->
+          <div class="enrolled-drives-card" style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+              <h3 style="font-size: 1.15rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>Drives Organized by Me</span>
+                <span class="organizer-badge">Organizer 🛡️</span>
+              </h3>
+              <button type="button" class="btn btn-secondary" onclick="openHostDriveModal()" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">
+                + Host a New Drive
+              </button>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+              Manage and conclude your hosted initiatives. Concluding updates status to Completed and prompts for post-cleanup "After" photos for verification.
+            </p>
+
+            <div style="overflow-x: auto;">
+              <table class="enrolled-table">
+                <thead>
+                  <tr>
+                    <th>Drive Campaign</th>
+                    <th>Date & Status</th>
+                    <th>Volunteers</th>
+                    <th>Organizer Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="organizedDrivesTableBody">
+                  <!-- Rendered dynamically by app.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- My Enrolled Drives Table -->
+          <div class="enrolled-drives-card">
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">My Active Volunteer Enrollments</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+              All registered clean-up drives with contact and reporting instructions.
+            </p>
+
+            <div style="overflow-x: auto;">
+              <table class="enrolled-table">
+                <thead>
+                  <tr>
+                    <th>Drive Title</th>
+                    <th>Date & Time</th>
+                    <th>Venue</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="enrolledDrivesTableBody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================================================================
+       MODAL 1: DRIVE DETAIL & 1-CLICK INSTANT REGISTRATION
+       =================================================================== -->
+  <div class="modal-overlay" id="driveDetailModal">
+    <div class="modal-box">
+      <button type="button" class="modal-close-btn" onclick="closeDriveModal()" aria-label="Close modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+
+      <div style="position: relative;">
+        <img class="modal-banner" id="modalDriveBanner" src="" alt="Drive Banner">
+        <span class="category-badge" id="modalCategoryBadge" style="top: auto; bottom: 12px; left: 16px;"></span>
+      </div>
+
+      <div class="modal-content-scroll">
+        <h2 class="modal-drive-title" id="modalDriveTitle"></h2>
+
+        <div class="modal-specs-grid">
+          <div class="spec-cell">
+            <span class="spec-label">Date & Time</span>
+            <span class="spec-value" id="modalDriveDateTime"></span>
+          </div>
+          <div class="spec-cell">
+            <span class="spec-label">Coordinator</span>
+            <span class="spec-value" id="modalCoordinator"></span>
+          </div>
+        </div>
+
+        <div style="background: #F8FAF9; padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <span class="spec-label" style="display: block; margin-bottom: 0.35rem;">Venue & Google Maps Navigation</span>
+          <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem;" id="modalVenueName"></div>
+          <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-outline" id="modalMapsLink" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Open in Google Maps ↗
+          </a>
+        </div>
+
+        <div>
+          <span class="spec-label" style="display: block; margin-bottom: 0.35rem;">Initiative Description</span>
+          <p style="font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary);" id="modalDriveDescription"></p>
+        </div>
+
+        <div>
+          <span class="spec-label" style="display: block; margin-bottom: 0.5rem;">Safety Gear Provided on Site (Complimentary)</span>
+          <div class="pill-list" id="modalSafetyPills"></div>
+        </div>
+
+        <div>
+          <span class="spec-label" style="display: block; margin-bottom: 0.5rem;">Mandatory Items to Bring Along</span>
+          <div class="pill-list" id="modalBringPills"></div>
+        </div>
+
+        <!-- Organizer Controls in Detail Modal (Shown only to drive creator) -->
+        <div id="modalOrganizerControls" style="display: none; background: #FEF3C7; border: 1px solid #FCD34D; border-radius: var(--radius-md); padding: 0.85rem 1rem; margin-top: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span class="organizer-badge">You are the Organizer 🛡️</span>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button type="button" class="btn-conclude" id="modalConcludeBtn" onclick="handleModalConcludeClick()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Conclude Drive
+              </button>
+              <button type="button" class="btn-delete" id="modalDeleteBtn" onclick="handleModalDeleteClick()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                Cancel / Delete
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Volunteer Progress Bar -->
+        <div class="capacity-box" style="margin-top: 0.5rem;">
+          <div class="capacity-labels">
+            <span>Volunteer Slots Filled</span>
+            <span id="modalCapacityRatio">0 / 100</span>
+          </div>
+          <div class="progress-track" style="height: 10px;">
+            <div class="progress-bar-fill" id="modalProgressBar" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">1-Click Instant Registration</div>
+          <div style="font-size: 0.85rem; font-weight: 600; color: var(--primary-hover);" id="modalUserSyncStatus">
+            Using verified profile details
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary" id="modalJoinBtn" onclick="handleModalJoinClick()" style="padding: 0.75rem 1.75rem; font-size: 0.95rem;">
+          Join Drive Now 🌿
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 2: HOST A DRIVE MODAL (With Device Image Upload)
+       =================================================================== -->
+  <div class="modal-overlay" id="hostDriveModal">
+    <div class="modal-box" style="max-width: 640px;">
+      <button type="button" class="modal-close-btn" onclick="closeHostDriveModal()" aria-label="Close modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+
+      <div style="background: var(--primary); color: white; padding: 1.5rem;">
+        <h3 style="color: white; font-size: 1.35rem; margin-bottom: 0.25rem;">Publish an Environmental Drive 🌍</h3>
+        <p style="color: #D1FAE5; font-size: 0.85rem;">Mobilize citizens, student clubs, and local volunteers in your city.</p>
+      </div>
+
+      <form id="hostDriveForm" onsubmit="handleHostDriveSubmit(event)" class="modal-content-scroll">
+        <div class="form-group">
+          <label class="form-label" for="hostTitle">Drive Campaign Title *</label>
+          <input class="form-input" type="text" id="hostTitle" placeholder="e.g. Juhu Beach Sunrise Plastic Interception" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="hostCategory">Ecosystem Category *</label>
+            <select class="form-select" id="hostCategory" required>
+              <option value="Beach">Beach 🏖️</option>
+              <option value="River">River 🌊</option>
+              <option value="Tree Plantation">Tree Plantation 🌱</option>
+              <option value="Urban Cleanup">Urban Lake / Park 🏙️</option>
+              <option value="E-Waste">E-Waste Collection 🔌</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="hostMaxVolunteers">Target Capacity (Volunteers) *</label>
+            <input class="form-input" type="number" id="hostMaxVolunteers" min="5" max="1000" value="50" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="hostDateTime">Date & Gathering Time *</label>
+            <input class="form-input" type="datetime-local" id="hostDateTime" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="hostCity">City *</label>
+            <input class="form-input" type="text" id="hostCity" placeholder="Mumbai, Delhi, Nagpur, Bengaluru..." required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="hostVenue">Exact Venue Landmark *</label>
+          <input class="form-input" type="text" id="hostVenue" placeholder="e.g. Near Shivaji Statue, Girgaon Chowpatty" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="hostMapsUrl">Google Maps Link *</label>
+          <input class="form-input" type="url" id="hostMapsUrl" placeholder="https://maps.google.com/?q=..." required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="hostCoordinatorName">Coordinator Name *</label>
+            <input class="form-input" type="text" id="hostCoordinatorName" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="hostCoordinatorPhone">Coordinator Phone (+91) *</label>
+            <input class="form-input" type="tel" id="hostCoordinatorPhone" pattern="^(\+91)?[6-9]\d{9}$" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="hostDescription">Initiative Brief & Segregation Goals *</label>
+          <textarea class="post-textarea" id="hostDescription" placeholder="Explain the cleanup mission, waste collection points, and municipal transport tie-ups..." required></textarea>
+        </div>
+
+        <!-- Location Image Upload (Device Upload with Instant Preview) -->
+        <div class="form-group">
+          <label class="form-label">Location Photo ("Before Drive" Cover Photo) *</label>
+          <div class="image-upload-dropzone" id="hostImageDropzone">
+            <input type="file" id="hostImageFile" class="upload-file-input" accept="image/jpeg,image/png,image/webp" onchange="handleHostImageSelect(event)">
+            <div class="upload-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <div style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary);">Click or drag to upload photo from your device</div>
+            <div style="font-size: 0.725rem; color: var(--text-muted);">Supports JPG, PNG, WebP (Max 5MB)</div>
+          </div>
+
+          <div id="hostImagePreviewWrap" class="upload-preview-container" style="display: none;">
+            <img id="hostImagePreview" class="upload-preview-img" src="" alt="Drive Location Preview">
+            <button type="button" class="upload-remove-btn" onclick="removeHostImage()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              Remove
+            </button>
+          </div>
+          <input type="hidden" id="hostUploadedDataUrl" value="">
+
+          <div style="margin-top: 0.4rem;">
+            <details style="font-size: 0.75rem; color: var(--text-muted); cursor: pointer;">
+              <summary>Or enter an external Image URL</summary>
+              <input class="form-input" type="url" id="hostBannerUrl" placeholder="https://images.unsplash.com/..." style="margin-top: 0.35rem; font-size: 0.8rem; padding: 0.4rem 0.6rem;">
+            </details>
+          </div>
+        </div>
+
+        <div class="email-callout-box" style="margin: 0.5rem 0;">
+          <strong>📧 Automated Status Email:</strong> A publishing confirmation and drive briefing will be emailed immediately to: <span id="hostOrganizerEmailTag" style="font-weight: 700;">you@example.com</span>.
+        </div>
+
+        <div class="modal-footer" style="margin-top: 1rem; padding: 1rem 0 0;">
+          <button type="button" class="btn btn-outline" onclick="closeHostDriveModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="publishDriveBtn">Publish Clean-up Drive 🚀</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 3: DIGITAL VOLUNTEER CERTIFICATE
+       =================================================================== -->
+  <div class="modal-overlay" id="certificateModal">
+    <div class="modal-box" style="max-width: 680px;">
+      <button type="button" class="modal-close-btn" onclick="closeCertificateModal()" aria-label="Close certificate">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+
+      <div class="certificate-frame" id="printableCertificate">
+        <div class="cert-emblem">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        </div>
+        <div style="font-size: 0.8rem; font-weight: 700; letter-spacing: 0.15em; color: #15803D;">CLEANBHARAT CONNECT • PRAKRITISETU</div>
+        <div class="cert-title">Certificate of Environmental Excellence</div>
+        <p style="font-size: 0.9rem; color: #475569; margin-top: 0.5rem;">This certificate is proudly awarded to</p>
+        
+        <div class="cert-name" id="certUserName">Ananya Patel</div>
+        
+        <p style="font-size: 0.9rem; color: #475569; max-width: 500px; margin: 0 auto; line-height: 1.6;">
+          for demonstrating civic stewardship, physical voluntary service, and active participation in ecological waste segregation at the initiative:
+        </p>
+        
+        <div style="font-weight: 700; color: #166534; font-size: 1.1rem; margin: 0.75rem 0;" id="certDriveTitle">
+          Mahim Beach Coastal Cleansing Mission
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 2rem; border-top: 1px dashed #86EFAC; padding-top: 1rem; font-size: 0.8rem; color: #475569;">
+          <div style="text-align: left;">
+            <div><strong>Verification ID:</strong> CBC-ENV-2026-9812</div>
+            <div id="certDriveDate">Date of Service: October 2026</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-family: 'Poppins', cursive; font-size: 1.2rem; color: #1B5E20; font-weight: 700;">Aarav Sharma</div>
+            <div>Authorized Drive Director</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: space-between;">
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Verifiable on CleanBharat Registry</span>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn btn-outline" onclick="window.print()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print / Save PDF
+          </button>
+          <button type="button" class="btn btn-primary" onclick="closeCertificateModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 4: CONCLUDE DRIVE MODAL (Upload After Photo & Metrics)
+       =================================================================== -->
+  <div class="modal-overlay" id="concludeDriveModal">
+    <div class="modal-box" style="max-width: 620px;">
+      <button type="button" class="modal-close-btn" onclick="closeConcludeModal()" aria-label="Close modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+
+      <div style="background: linear-gradient(135deg, #0284C7, #0369A1); color: white; padding: 1.5rem;">
+        <h3 style="color: white; font-size: 1.35rem; margin-bottom: 0.25rem;">Conclude Clean-up Initiative 🏁</h3>
+        <p style="color: #E0F2FE; font-size: 0.85rem;">Upload the verified "After Drive" photo to showcase the site transformation in Past Drives.</p>
+      </div>
+
+      <form id="concludeDriveForm" onsubmit="handleFinishConcludeSubmit(event)" class="modal-content-scroll">
+        <input type="hidden" id="concludeDriveId" value="">
+
+        <div style="background: #F0F9FF; border: 1px solid #BAE6FD; border-radius: var(--radius-md); padding: 0.85rem 1rem; margin-bottom: 1rem;">
+          <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #0284C7;">Drive Being Concluded</div>
+          <div style="font-weight: 700; font-size: 1.05rem; color: #0C4A6E; margin-top: 0.15rem;" id="concludeDriveTitleDisplay">Loading...</div>
+        </div>
+
+        <!-- Post-Cleanup Device Photo Upload -->
+        <div class="form-group">
+          <label class="form-label">Post-Cleanup Result Photo ("After Drive" Verification) *</label>
+          <div class="image-upload-dropzone" id="concludeImageDropzone">
+            <input type="file" id="concludeImageFile" class="upload-file-input" accept="image/jpeg,image/png,image/webp" onchange="handleConcludeImageSelect(event)">
+            <div class="upload-icon" style="background: #E0F2FE; color: #0284C7;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <div style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary);">Click or drag to upload "After" photo from your device</div>
+            <div style="font-size: 0.725rem; color: var(--text-muted);">Supports JPG, PNG, WebP (Max 5MB)</div>
+          </div>
+
+          <div id="concludeImagePreviewWrap" class="upload-preview-container" style="display: none;">
+            <img id="concludeImagePreview" class="upload-preview-img" src="" alt="After Cleanup Preview">
+            <button type="button" class="upload-remove-btn" onclick="removeConcludeImage()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              Remove
+            </button>
+          </div>
+          <input type="hidden" id="concludeUploadedDataUrl" value="">
+
+          <div style="margin-top: 0.4rem;">
+            <details style="font-size: 0.75rem; color: var(--text-muted); cursor: pointer;">
+              <summary>Or enter an external After Image URL</summary>
+              <input class="form-input" type="url" id="concludeAfterUrl" placeholder="https://images.unsplash.com/..." style="margin-top: 0.35rem; font-size: 0.8rem; padding: 0.4rem 0.6rem;">
+            </details>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="concludeWasteMetric">Waste Collected & Segregated *</label>
+            <input class="form-input" type="text" id="concludeWasteMetric" placeholder="e.g. 420 kg plastic & debris" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="concludeTreesCount">Saplings/Trees Planted</label>
+            <input class="form-input" type="number" id="concludeTreesCount" min="0" value="0">
+          </div>
+        </div>
+
+        <div class="email-callout-box" style="margin: 0.5rem 0;">
+          <strong>📧 Automated Completion Email:</strong> A final stewardship summary and digital certificate will be emailed to your registered email: <span id="concludeEmailTarget" style="font-weight: 700;">you@example.com</span>.
+        </div>
+
+        <div class="modal-footer" style="margin-top: 1rem; padding: 1rem 0 0;">
+          <button type="button" class="btn btn-outline" onclick="closeConcludeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="finishConcludeBtn" style="background: #0284C7; border-color: #0284C7;">
+            Finish & Move to Past Drives 🏁
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 5: DELETE / CANCEL DRIVE CONFIRMATION MODAL
+       =================================================================== -->
+  <div class="modal-overlay" id="deleteDriveModal">
+    <div class="modal-box" style="max-width: 480px;">
+      <button type="button" class="modal-close-btn" onclick="closeDeleteModal()" aria-label="Close modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+
+      <div style="padding: 1.75rem; text-align: center;">
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: #FEE2E2; color: #DC2626; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+
+        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; color: #991B1B;">Cancel Clean-up Initiative?</h3>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+          Are you sure you want to cancel <strong id="deleteDriveTitleDisplay" style="color: var(--text-primary);">this drive</strong>?
+          This action cannot be undone and will remove the drive from the public registry.
+        </p>
+
+        <input type="hidden" id="deleteTargetDriveId" value="">
+
+        <div style="display: flex; gap: 0.75rem; justify-content: center; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-outline" onclick="closeDeleteModal()" style="flex: 1;">Keep Initiative</button>
+          <button type="button" class="btn btn-danger" onclick="confirmDeleteDrive()" style="flex: 1; background: #DC2626; color: white; border-color: #DC2626;">Yes, Cancel Drive</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 6: IN-APP EMAIL NOTIFICATIONS INSPECTOR
+       =================================================================== -->
+  <div class="modal-overlay" id="emailNotificationModal">
+    <div class="modal-box" style="max-width: 680px;">
+      <button type="button" class="modal-close-btn" onclick="closeNotificationModal()" aria-label="Close modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+
+      <div style="background: #1E293B; color: white; padding: 1.5rem; border-radius: var(--radius-xl) var(--radius-xl) 0 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="color: white; font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>Automated Status Emails</span>
+            <span style="font-size: 0.75rem; background: #334155; padding: 0.15rem 0.5rem; border-radius: var(--radius-full); font-weight: 500;">Mail Relay Inspector</span>
+          </h3>
+          <button type="button" onclick="clearAllNotifications()" style="background: none; border: none; color: #94A3B8; font-size: 0.75rem; cursor: pointer; text-decoration: underline;">Clear All</button>
+        </div>
+        <p style="color: #94A3B8; font-size: 0.8rem; margin-top: 0.25rem;">Real transactional emails triggered automatically upon publishing and concluding drives.</p>
+      </div>
+
+      <div class="modal-content-scroll" style="padding: 1.5rem; max-height: 520px;" id="emailNotificationsList">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: space-between;">
+        <span style="font-size: 0.75rem; color: var(--text-muted);">Dispatched to registered organizer email</span>
+        <button type="button" class="btn btn-primary" onclick="closeNotificationModal()">Close Inspector</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

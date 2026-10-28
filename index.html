@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CleanBharat Connect - Community Clean-up Drive Portal</title>
+  <meta name="description" content="A production-grade portal for organizing, joining, and tracking environmental clean-up drives across India with 1-click registration, impact metrics, and community engagement.">
+  <meta property="og:title" content="CleanBharat Connect - Community Clean-up Drive Portal">
+  <meta property="og:description" content="A production-grade portal for organizing, joining, and tracking environmental clean-up drives across India with 1-click registration, impact metrics, and community engagement.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="auth-page-wrapper">
+    <div class="auth-split-card">
+      
+      <!-- Left Hero Banner Pane -->
+      <div class="auth-hero-pane">
+        <div>
+          <div class="brand-wrapper" style="margin-bottom: 2rem;">
+            <div class="brand-logo-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="m9 12 2 2 4-4"/>
+              </svg>
+            </div>
+            <div class="brand-name" style="color: white;">
+              CleanBharat
+              <span class="brand-tagline" style="color: #A7F3D0;">PrakritiSetu</span>
+            </div>
+          </div>
+          
+          <h2 style="font-size: 2rem; line-height: 1.25; margin-bottom: 1rem; color: white;">
+            Unite for a Cleaner, Greener India.
+          </h2>
+          <p style="color: #D1FAE5; font-size: 0.95rem; line-height: 1.6;">
+            Discover verified coastal clean-ups, riverbed restorations, and urban plantation drives across Mumbai, Delhi, Nagpur, Bengaluru, and beyond. Join with 1-click.
+          </p>
+        </div>
+
+        <div style="background: rgba(255, 255, 255, 0.12); padding: 1.25rem; border-radius: var(--radius-lg); backdrop-filter: blur(10px); margin-top: 2rem;">
+          <div style="display: flex; gap: 1.5rem; justify-content: space-around;">
+            <div style="text-align: center;">
+              <div style="font-size: 1.4rem; font-weight: 800; font-family: 'Poppins', sans-serif;">8,420+</div>
+              <div style="font-size: 0.75rem; color: #D1FAE5;">KG Plastic Diverted</div>
+            </div>
+            <div style="border-right: 1px solid rgba(255, 255, 255, 0.2);"></div>
+            <div style="text-align: center;">
+              <div style="font-size: 1.4rem; font-weight: 800; font-family: 'Poppins', sans-serif;">640+</div>
+              <div style="font-size: 0.75rem; color: #D1FAE5;">Active Stewards</div>
+            </div>
+            <div style="border-right: 1px solid rgba(255, 255, 255, 0.2);"></div>
+            <div style="text-align: center;">
+              <div style="font-size: 1.4rem; font-weight: 800; font-family: 'Poppins', sans-serif;">100%</div>
+              <div style="font-size: 0.75rem; color: #D1FAE5;">Verified Drives</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Form Pane -->
+      <div class="auth-form-pane">
+        
+        <div class="auth-tabs-toggle">
+          <button type="button" class="auth-toggle-btn active" id="tabLoginBtn" onclick="switchAuthTab('login')">Sign In</button>
+          <button type="button" class="auth-toggle-btn" id="tabSignupBtn" onclick="switchAuthTab('signup')">Create Account</button>
+        </div>
+
+        <!-- Sign In Form (Production: Clean Inputs & Strict Credentials Validation) -->
+        <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+          <div style="margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.4rem; margin-bottom: 0.25rem;">Welcome back, Steward</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">Enter your registered credentials to access your portal.</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="loginEmail">Email Address</label>
+            <input class="form-input" type="email" id="loginEmail" placeholder="your.name@example.com" required autocomplete="email">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="loginPassword">Password</label>
+            <input class="form-input" type="password" id="loginPassword" placeholder="Enter your password" required autocomplete="current-password">
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; margin-top: 0.5rem;" id="loginSubmitBtn">
+            Sign In to Dashboard
+          </button>
+
+          <p style="text-align: center; font-size: 0.825rem; color: var(--text-secondary); margin-top: 1rem;">
+            Don't have an account yet? <a href="#" onclick="switchAuthTab('signup'); return false;" style="font-weight: 600;">Create Account</a>
+          </p>
+        </form>
+
+        <!-- Sign Up Form (Production: Includes Individual & Other Account Types) -->
+        <form id="signupForm" style="display: none;" onsubmit="handleSignupSubmit(event)">
+          <div style="margin-bottom: 1.25rem;">
+            <h3 style="font-size: 1.4rem; margin-bottom: 0.25rem;">Join CleanBharat</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">Register your account for community clean-up initiatives.</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="signupAccountType">Account Type</label>
+            <select class="form-select" id="signupAccountType" required>
+              <option value="Individual" selected>Individual Volunteer</option>
+              <option value="Student / College">Student / College Eco-Club</option>
+              <option value="Community Group">Community Group / RWA</option>
+              <option value="NGO / Non-Profit">Non-Profit / NGO</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="signupName">Full Legal Name</label>
+            <input class="form-input" type="text" id="signupName" placeholder="e.g. Priya Sharma" required autocomplete="name">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="signupPhone">Indian Mobile Number (+91)</label>
+            <input class="form-input" type="tel" id="signupPhone" placeholder="+919876543210" pattern="^(\+91)?[6-9]\d{9}$" required title="Please enter a valid 10-digit Indian mobile number prefixed optionally with +91" autocomplete="tel">
+            <small style="font-size: 0.72rem; color: var(--text-muted);">Used for SMS coordination & emergency contact on-site.</small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="signupEmail">Email Address</label>
+            <input class="form-input" type="email" id="signupEmail" placeholder="your.email@example.com" required autocomplete="email">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="signupPassword">Create Password</label>
+            <input class="form-input" type="password" id="signupPassword" placeholder="Minimum 6 characters" minlength="6" required autocomplete="new-password">
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; margin-top: 0.5rem;" id="signupSubmitBtn">
+            Continue to Profile Setup →
+          </button>
+
+          <p style="text-align: center; font-size: 0.825rem; color: var(--text-secondary); margin-top: 1rem;">
+            Already registered? <a href="#" onclick="switchAuthTab('login'); return false;" style="font-weight: 600;">Sign In</a>
+          </p>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Onboarding Modal for New Users -->
+  <div class="modal-overlay" id="onboardingModal">
+    <div class="modal-box" style="max-width: 580px;">
+      <div style="background: var(--primary); color: white; padding: 1.5rem;">
+        <h3 style="color: white; font-size: 1.35rem; margin-bottom: 0.25rem;">Complete Your Eco-Profile 🌿</h3>
+        <p style="color: #D1FAE5; font-size: 0.85rem;">This enables instant 1-click registration for all future clean-up drives.</p>
+      </div>
+
+      <div class="modal-content-scroll">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="onboardCity">Your City</label>
+            <select class="form-select" id="onboardCity" required>
+              <option value="Mumbai">Mumbai, MH</option>
+              <option value="Delhi">Delhi-NCR</option>
+              <option value="Nagpur">Nagpur, MH</option>
+              <option value="Bengaluru">Bengaluru, KA</option>
+              <option value="Pune">Pune, MH</option>
+              <option value="Chennai">Chennai, TN</option>
+              <option value="Kolkata">Kolkata, WB</option>
+              <option value="Lucknow">Lucknow, UP</option>
+              <option value="Bhopal">Bhopal, MP</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="onboardPincode">Pincode (6-digit)</label>
+            <input class="form-input" type="text" id="onboardPincode" placeholder="400050" pattern="^[1-9][0-9]{5}$" required maxlength="6">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="onboardEducation">College / University / Organization</label>
+          <input class="form-input" type="text" id="onboardEducation" placeholder="e.g. Independent Volunteer, University, or Company">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Select Your Environmental Interests</label>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.35rem;" id="interestTagsContainer">
+            <span class="tag-check selected" onclick="toggleTag(this)">Beach Cleanups 🏖️</span>
+            <span class="tag-check selected" onclick="toggleTag(this)">River Restoration 🌊</span>
+            <span class="tag-check" onclick="toggleTag(this)">Tree Plantation 🌱</span>
+            <span class="tag-check selected" onclick="toggleTag(this)">Plastic Segregation ♻️</span>
+            <span class="tag-check" onclick="toggleTag(this)">E-Waste Collection 🔌</span>
+            <span class="tag-check" onclick="toggleTag(this)">Wetland Conservation 🦆</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <span style="font-size: 0.8rem; color: var(--text-secondary);">Earns +50 Initial Eco-Points</span>
+        <button type="button" class="btn btn-primary" onclick="finishOnboarding()">
+          Save & Enter CleanBharat Connect
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script type="module" src="app.js"></script>
+  <script type="module">
+    // Tab switching for Sign In / Sign Up
+    function switchAuthTab(tab) {
+      const loginForm = document.getElementById('loginForm');
+      const signupForm = document.getElementById('signupForm');
+      const tabLoginBtn = document.getElementById('tabLoginBtn');
+      const tabSignupBtn = document.getElementById('tabSignupBtn');
+
+      if (tab === 'login') {
+        loginForm.style.display = 'block';
+        signupForm.style.display = 'none';
+        tabLoginBtn.classList.add('active');
+        tabSignupBtn.classList.remove('active');
+      } else {
+        loginForm.style.display = 'none';
+        signupForm.style.display = 'block';
+        tabLoginBtn.classList.remove('active');
+        tabSignupBtn.classList.add('active');
+      }
+    }
+
+    function toggleTag(el) {
+      el.classList.toggle('selected');
+    }
+
+    // Auto-check session on load
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.CleanBharatEngine) {
+        const currentUser = window.CleanBharatEngine.getCurrentUser();
+        if (currentUser && currentUser.onboarded) {
+          window.location.href = 'home.html';
+        }
+      }
+    });
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('loginSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Authenticating...';
+
+      const res = await window.CleanBharatEngine.loginUser(email, password);
+      if (res.success) {
+        window.CleanBharatEngine.showToast('Welcome back! Redirecting to drives...', 'success');
+        setTimeout(() => { window.location.href = 'home.html'; }, 600);
+      } else {
+        window.CleanBharatEngine.showToast(res.error || 'Invalid email or password. Please try again.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Sign In to Dashboard';
+      }
+    }
+
+    let pendingSignupData = null;
+
+    async function handleSignupSubmit(e) {
+      e.preventDefault();
+      const accountType = document.getElementById('signupAccountType').value;
+      const fullName = document.getElementById('signupName').value.trim();
+      let phone = document.getElementById('signupPhone').value.trim();
+      if (!phone.startsWith('+91')) {
+        phone = '+91' + phone.replace(/^0+/, '');
+      }
+      const email = document.getElementById('signupEmail').value.trim();
+      const password = document.getElementById('signupPassword').value;
+
+      pendingSignupData = { accountType, fullName, phone, email, password };
+      
+      // Open onboarding modal for city, education & interests
+      document.getElementById('onboardingModal').classList.add('open');
+    }
+
+    async function finishOnboarding() {
+      const city = document.getElementById('onboardCity').value;
+      const pincode = document.getElementById('onboardPincode').value.trim();
+      const education = document.getElementById('onboardEducation').value.trim();
+      
+      const selectedTags = Array.from(document.querySelectorAll('#interestTagsContainer .tag-check.selected'))
+        .map(t => t.textContent.trim());
+
+      const fullData = {
+        ...pendingSignupData,
+        city: city || 'Mumbai',
+        pincode: pincode || '400050',
+        college_or_education: education || (pendingSignupData.accountType === 'Individual' ? 'Individual Volunteer' : pendingSignupData.accountType),
+        eco_interests: selectedTags
+      };
+
+      const res = await window.CleanBharatEngine.registerUser(fullData);
+      if (res.success) {
+        window.CleanBharatEngine.showToast('Account created successfully! Welcome to CleanBharat.', 'success');
+        setTimeout(() => { window.location.href = 'home.html'; }, 700);
+      } else {
+        window.CleanBharatEngine.showToast(res.error || 'Error completing signup. Please try again.', 'error');
+      }
+    }
+
+    // Expose handlers to window for inline HTML onclick/onsubmit attributes
+    window.switchAuthTab = switchAuthTab;
+    window.toggleTag = toggleTag;
+    window.handleLoginSubmit = handleLoginSubmit;
+    window.handleSignupSubmit = handleSignupSubmit;
+    window.finishOnboarding = finishOnboarding;
+  </script>
+</body>
+</html>
